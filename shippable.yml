@@ -5,7 +5,7 @@ rvm:
 
 services:
    - mongodb
-
+build_image: drydock/u12rubpls:tip
 env:
   global:
     - APP_NAME=thawing-journey-6674
