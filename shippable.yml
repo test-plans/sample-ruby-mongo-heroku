@@ -8,10 +8,11 @@ services:
 
 env:
   global:
-    - APP_NAME=thawing-journey-6674
+    - APP_NAME=sample-ruby-mongo-heroku
     - MONGOLAB_URI=mongodb://localhost/test
     - CI_REPORTS=shippable/testresults/results.xml COVERAGE_REPORTS=shippable/codecoverage
     - secure: AADZ3DsVNcobW67L+aPxxAYvHSrOEQbVcwxqQQAsd0kPGSNNLGkwa5Ole3NWDs1jR1DEwpe6y18tdwEUyHBBSQc8AD7bn9Q7M1vlxxJjrR7P3ukhvQPkU8BEQMWZG+1yEMqdnifEYlk26sC+6Od7l5J1/BSgKcrE0N8G/HLjLQLyekgoocrps8XX8L/yL8HZ8nAqtuDPPQiXYKz9oK8bikVfwhTYc79dYjOoPo5m1uqG93CKpXLZ+wkRdYDx8u0W8h6WlNj+TcOLyVZtMpnIDwVwcl9goB70HSHG4e4zo0QhKgbWBpjS/t1xwERfCQclHaglppEcWedoD3cln1dYYQ==
+    - secure: FtJvP2320e+ssTjBpVyzaRLenjc9vn9Q5/TosYUZZz5tppW3uqCZLSnn+yqSSgPpuSwxmFvE16pJam4BEHt4phJYd1BOeoENYIKZzG6jA9lm3bW41QYJREy+JMDOBvkhqvtiquTqC12aX7T9iut9y+RXhnsAJJPFx4zLunLUzmlLTx4RZGtuuiExl/rr75G3UmfJldQ8tvf02o6/fKJZex3dbtPa9XO0kN2RVZgOvAVrMa4OfnpmrzB0ok0nbaRQIr9P1eSfmdfr/9ds3A5obdYFb2i3x63KuDTqHcFhVfbOQplaztmGSDLMlO5LA7GllvLSNTybi/MMr7uQsD+jkA==
     #- secure: MRuHkLbL9HPkJPU5lzkKM1+NOq1S5RrhxEyhJkk60xxYiF7DMzydiBN8oFBjWrSmyGeGRuEC22a0I5ItobdWVszfcJCaXHwtfKzfGOUdKuyCnDgvojXhv/jrBvULyLK6zsLw3b8NMxdnwNsHqSPm19qW/EIGEl9Zv/637Igos69z9aT7+xrEG013+6HtKYb8RHm+iPSNsFoBi/RSAHYuM1eLTZWG2WAkjgzZaYmrHCgNwVmk+HOGR+TOWN7Iu5lrjyvC1XDCQrOvo1hZI30cd9OqJ5aadFm3exQpNhI4I7AgOnCbK3NoWNc/GAnqKXCvsaIQ80Jd/uLIOVyMjD6Xmg==
 
 before_install:
@@ -21,3 +22,8 @@ before_script:
   - mkdir -p shippable/testresults
   - mkdir -p shippable/codecoverage
 
+after_success:
+  - test -f ~/.ssh/id_rsa.heroku || ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.heroku && heroku keys:add ~/.ssh/id_rsa.heroku
+  - git remote -v | grep ^heroku || heroku git:remote --ssh-git --app $APP_NAME
+  - git push -f heroku $BRANCH:master
+  - heroku run rake db:migrate
